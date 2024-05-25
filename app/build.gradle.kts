@@ -51,10 +51,5 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation ("com.github.dhaval2404:imagepicker:2.1")
-    implementation ("com.github.bumptech.glide:glide:4.15.1")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.google.android.gms:play-services-safetynet:18.0.1")
     implementation ("com.hbb20:ccp:2.5.0")
-
 }

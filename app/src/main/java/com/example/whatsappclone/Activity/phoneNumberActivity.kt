@@ -2,6 +2,7 @@ package com.example.whatsappclone.Activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,18 +25,17 @@ class phoneNumberActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        if (firebaseAuth.currentUser!= null){
+        /*if (firebaseAuth.currentUser!= null){
             startActivity(Intent(this,MainActivity::class.java))
             finish()
-        }
+        }*/
+        binding.loginCountrycode.registerCarrierNumberEditText(binding.PhoneNumber);
 
         binding.sendOTP.setOnClickListener {
-            if(binding.loginCountrycode.isValidFullNumber()){
-                binding.PhoneNumber.setError("Phone number not valid");
-                return@setOnClickListener
-            }
             intent =Intent(this,OTPActivity::class.java);
             intent.putExtra("phoneNumber",binding.loginCountrycode.getFullNumberWithPlus());
+            Log.d("khvvhvhdvahvdwvja", binding.loginCountrycode.getFullNumberWithPlus())
+            Log.d("khvvhvhdvahvdwvja","hi")
             startActivity(intent);
         }
     }

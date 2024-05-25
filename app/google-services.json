@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "461991664433",
+    "project_id": "chat-hub-a5f61",
+    "storage_bucket": "chat-hub-a5f61.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461991664433:android:2551000327f432e828ee10",
+        "android_client_info": {
+          "package_name": "com.example.whatsappclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKhEWX5hpmJNBZnFjgAMglEwSyMdD1bh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
