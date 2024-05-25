@@ -3,7 +3,7 @@
     <style name="Base.Theme.WhatsAppClone" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/my_primary</item>
     </style>
 
     <style name="Theme.WhatsAppClone" parent="Base.Theme.WhatsAppClone" />
