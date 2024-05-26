@@ -16,7 +16,12 @@ class FireBaseUtils {
             userId2 + "_" + userId1
         }
     }
-    fun getAllChatReference(chatroomId: String): CollectionReference {
-        return Firebase.firestore.collection("ChatRooms").document(chatroomId).collection("chats")
+    fun getAllChatReference(chatroomId: String): CollectionReference? {
+        try{
+            return Firebase.firestore.collection("ChatRooms").document(chatroomId)
+                .collection("chats")
+        }catch(e: Exception){
+            return null
+        }
     }
 }

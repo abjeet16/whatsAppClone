@@ -42,7 +42,7 @@ class chatRoom : AppCompatActivity() {
         handler = Handler(Looper.getMainLooper())
         runnable = object : Runnable {
             override fun run() {
-                // Your task to run every second
+                // Call function to update the UI
                 setUpRecyclerView()
 
                 // Re-post the runnable with a delay of 1 second
@@ -58,29 +58,37 @@ class chatRoom : AppCompatActivity() {
     }
 
     private fun setUpRecyclerView() {
-            fireBaseUtils.getAllChatReference(RoomId)
-                .get()
+        val chatRef = fireBaseUtils.getAllChatReference(RoomId)
+        if (chatRef!=null) {
+            chatRef.get()
                 .addOnSuccessListener { result ->
-                    val allMessage = mutableListOf<ChatMessage>()
-                    for (document in result) {
-                        val chat = document.toObject(ChatMessage::class.java)
-                        allMessage.add(chat)
-                    }
-                    //sorting the chats on  basis of time
-                    ALlMessage = allMessage.sortedBy { it.timestamp } as MutableList<ChatMessage>
-
-                    if (lastMessageTime != ALlMessage[ALlMessage.size - 1].timestamp && ALlMessage.isNotEmpty()) {
-                        adapter = ChatAdapter(ALlMessage)
-                        lastMessageTime = ALlMessage[ALlMessage.size - 1].timestamp!!
-                        binding.recyclerView.adapter = adapter
-                        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-                            .apply {
-                                stackFromEnd = true
-                            }
+                    //checking if the data is empty or not OR
+                    //if the DataReference exists or NOT
+                    if (result!=null && result.size()>0) {
+                        val allMessage = mutableListOf<ChatMessage>()
+                        for (document in result) {
+                            val chat = document.toObject(ChatMessage::class.java)
+                            allMessage.add(chat)
+                        }
+                        if (allMessage.isNotEmpty()) {
+                            //sorting the chats on  basis of time
+                            ALlMessage = allMessage.sortedBy { it.timestamp }
+                                    as MutableList<ChatMessage>
+                        }
+                        if (lastMessageTime != ALlMessage[ALlMessage.size - 1].timestamp && ALlMessage.isNotEmpty()) {
+                            adapter = ChatAdapter(ALlMessage)
+                            lastMessageTime = ALlMessage[ALlMessage.size - 1].timestamp!!
+                            binding.recyclerView.adapter = adapter
+                            binding.recyclerView.layoutManager = LinearLayoutManager(this)
+                                .apply {
+                                    stackFromEnd = true
+                                }
+                        }
                     }
                 }.addOnFailureListener {
                     Toast.makeText(this, "getting chat failed", Toast.LENGTH_SHORT).show()
                 }
+        }
     }
 
     private fun sendMessage() {
@@ -92,7 +100,7 @@ class chatRoom : AppCompatActivity() {
         binding.messageEditText.text.clear()
 
         // Scroll to the bottom when the current user sends a message
-        binding.recyclerView.scrollToPosition(adapter.itemCount - 1)
+        //binding.recyclerView.scrollToPosition(adapter.itemCount - 1)
 
         val messageUserModel = ChatMessage(
             senderId = currentUserId,
