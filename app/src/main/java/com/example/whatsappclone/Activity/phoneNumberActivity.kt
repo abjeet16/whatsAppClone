@@ -25,17 +25,17 @@ class phoneNumberActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        /*if (firebaseAuth.currentUser!= null){
+        if (firebaseAuth.currentUser!= null){
             startActivity(Intent(this,MainActivity::class.java))
             finish()
-        }*/
+        }
+
+        //connecting Country Code With the Phone Number Edit Text
         binding.loginCountrycode.registerCarrierNumberEditText(binding.PhoneNumber);
 
         binding.sendOTP.setOnClickListener {
             intent =Intent(this,OTPActivity::class.java);
-            intent.putExtra("phoneNumber",binding.loginCountrycode.getFullNumberWithPlus());
-            Log.d("khvvhvhdvahvdwvja", binding.loginCountrycode.getFullNumberWithPlus())
-            Log.d("khvvhvhdvahvdwvja","hi")
+            intent.putExtra("phoneNumber",binding.loginCountrycode.getFullNumberWithPlus().toString())
             startActivity(intent);
         }
     }

@@ -1,60 +1,62 @@
 package com.example.whatsappclone.fragments
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.whatsappclone.R
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.whatsappclone.Activity.chatRoom
+import com.example.whatsappclone.adapters.alluserAdapter
+import com.example.whatsappclone.databinding.FragmentChatfragmentBinding
+import com.example.whatsappclone.datamodels.userDetails
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [chatfragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class chatfragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+    private lateinit var binding: FragmentChatfragmentBinding
+    private lateinit var firebaseFirestore: FirebaseFirestore
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chatfragment, container, false)
+        binding = FragmentChatfragmentBinding.inflate(layoutInflater)
+
+        firebaseFirestore = Firebase.firestore
+        getAllUsers()
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment chatfragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            chatfragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun getAllUsers() {
+        firebaseFirestore.collection("users")
+            .get()
+            .addOnSuccessListener { result ->
+                val userList = mutableListOf<userDetails>()
+                Log.d("bhhjbhjcjsdj", result.toString())
+                for (document in result) {
+                    val user = document.toObject(userDetails::class.java)
+                    if (user.uid != FirebaseAuth.getInstance().uid) {
+                        userList.add(user)
+                    }
                 }
+                val adapter = alluserAdapter(userList,requireContext(),::chatItemClicked)
+                binding.recyclerViewChat.adapter = adapter
+                binding.recyclerViewChat.layoutManager = LinearLayoutManager(requireContext())
+            }.addOnFailureListener{
+                Toast.makeText(requireContext(),"failed to get all user", Toast.LENGTH_SHORT).show()
             }
+    }
+    fun chatItemClicked(userDetail:userDetails){
+        val intent = Intent(requireContext(),chatRoom::class.java)
+        intent.putExtra("userName",userDetail.name)
+        intent.putExtra("uid",userDetail.uid)
+        intent.putExtra("profileImageUrl",userDetail.profileImageUrl)
+        startActivity(intent)
     }
 }

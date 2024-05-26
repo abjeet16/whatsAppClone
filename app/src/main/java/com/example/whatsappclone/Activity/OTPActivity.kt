@@ -62,6 +62,7 @@ class OTPActivity : AppCompatActivity() {
                     Toast.makeText(this, "done", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this,ProfileActivity::class.java)
                     intent.putExtra("number",phoneNumber)
+                    startActivity(intent)
                     finish()
                 } else {
                     Log.e("OTPActivity", "signInWithCredential:failure", task.exception)
