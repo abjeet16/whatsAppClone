@@ -83,8 +83,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/StatusCard"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginStart="10dp"
             app:cardCornerRadius="50dp"
             android:layout_marginTop="10dp"
@@ -93,13 +93,14 @@
             app:layout_constraintTop_toBottomOf="@+id/textView3">
 
             <ImageView
-                android:id="@+id/profileImage"
+                android:id="@+id/StatusImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
+            android:id="@+id/StatusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -114,6 +115,7 @@
                 android:fontFamily="@font/latobold"
                 android:text="My Status" />
             <TextView
+                android:id="@+id/timeAgo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="26 minutes ago" />

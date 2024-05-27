@@ -38,7 +38,6 @@ class chatfragment : Fragment() {
             .get()
             .addOnSuccessListener { result ->
                 val userList = mutableListOf<userDetails>()
-                Log.d("bhhjbhjcjsdj", result.toString())
                 for (document in result) {
                     val user = document.toObject(userDetails::class.java)
                     if (user.uid != FirebaseAuth.getInstance().uid) {
