@@ -24,7 +24,7 @@ class statusFragment : Fragment() {
 
     private lateinit var binding: FragmentStatusBinding
     private val fireBaseUtils = FireBaseUtils()
-    private lateinit var myStatusList:MutableList<Status>
+    private var myStatusList:MutableList<Status> = mutableListOf()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,10 +41,10 @@ class statusFragment : Fragment() {
             val intent = Intent(context, StatusUploadScreen::class.java)
             startActivity(intent)
         }
-        if (myStatusList.isNotEmpty()) {
-            binding.StatusCard.setOnClickListener{
+        binding.StatusCard.setOnClickListener{
+            if (myStatusList.isNotEmpty()) {
                 val intent = Intent(requireContext(), StatusView::class.java)
-                intent.putExtra("statusList",ArrayList(myStatusList))
+                intent.putExtra("statusList", ArrayList(myStatusList))
                 startActivity(intent)
             }
         }
@@ -55,7 +55,7 @@ class statusFragment : Fragment() {
             .get()
             .addOnSuccessListener { result ->
                 if (result.documents.isNotEmpty()) {
-                    myStatusList = mutableListOf<Status>()
+                    myStatusList = mutableListOf()
                     for (document in result) {
                         val status = document.toObject(Status::class.java)
                         myStatusList.add(status)
@@ -71,6 +71,6 @@ class statusFragment : Fragment() {
     fun convertMillisToHoursAndMinutes(millis: Long): String {
         val hours = TimeUnit.MILLISECONDS.toHours(millis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(hours)
-        return String.format("%02d:%02d", hours, minutes)
+        return String.format("%02d hr:%02d min", hours, minutes)
     }
 }

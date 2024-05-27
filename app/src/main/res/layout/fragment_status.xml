@@ -118,7 +118,7 @@
                 android:id="@+id/timeAgo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="26 minutes ago" />
+                android:text="no status" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <TextView

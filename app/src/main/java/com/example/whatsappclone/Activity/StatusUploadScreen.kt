@@ -3,6 +3,7 @@ package com.example.whatsappclone.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -47,6 +48,7 @@ class StatusUploadScreen : AppCompatActivity() {
                 finish()
             }
             uploadImage.setOnClickListener {
+                binding.uploadImage.visibility = View.GONE
                 uploadImageToFirebase(Uri.parse(profileImageLocalPath))
             }
         }
@@ -75,13 +77,9 @@ class StatusUploadScreen : AppCompatActivity() {
                 }
                 .addOnFailureListener { e ->
                     // Handle unsuccessful uploads
-
+                    binding.uploadImage.visibility = View.VISIBLE
                 }
-                .addOnProgressListener { taskSnapshot ->
-                    val progress = (100.0 * taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount)
-                    // Update UI with progress if needed
-
-                }
+                .addOnProgressListener { taskSnapshot -> }
         }
     }
 
@@ -97,9 +95,11 @@ class StatusUploadScreen : AppCompatActivity() {
             .add(statusInfo)
             .addOnSuccessListener {
                 Toast.makeText(this, "status uploaded successfully", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
             .addOnFailureListener { e ->
+                binding.uploadImage.visibility = View.VISIBLE
                 Toast.makeText(this, "Error : ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
