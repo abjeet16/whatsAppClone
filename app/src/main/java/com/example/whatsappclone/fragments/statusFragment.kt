@@ -33,7 +33,20 @@ class statusFragment : Fragment() {
 
         setMyStatus()
         setUpClickListener()
+        setUpOthersStatus()
         return binding.root
+    }
+
+    private fun setUpOthersStatus() {
+        fireBaseUtils.getAllTheUsersWithStatus().get()
+            .addOnSuccessListener { result ->
+                if(result.documents.isNotEmpty()){
+                    for (document in result) {
+                        val status = document.toObject(String)
+                        myStatusList.add(status)
+                    }
+                }
+            }
     }
 
     private fun setUpClickListener() {
@@ -68,9 +81,13 @@ class statusFragment : Fragment() {
                 Toast.makeText(requireContext(),"failed to get all user", Toast.LENGTH_SHORT).show()
             }
     }
-    fun convertMillisToHoursAndMinutes(millis: Long): String {
+    private fun convertMillisToHoursAndMinutes(millis: Long): String {
         val hours = TimeUnit.MILLISECONDS.toHours(millis)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(hours)
-        return String.format("%02d hr:%02d min", hours, minutes)
+        if (hours>24){
+            val days = TimeUnit.MILLISECONDS.toDays(millis)
+            return String.format("%d days ago", days)
+        }
+        return String.format("%02dhr:%02dmin ago", hours, minutes)
     }
 }

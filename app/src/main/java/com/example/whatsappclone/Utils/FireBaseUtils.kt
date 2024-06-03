@@ -13,6 +13,9 @@ class FireBaseUtils {
     fun getStatusReference(): CollectionReference {
         return FirebaseFirestore.getInstance().collection("Status").document(getCurrentUserId()!!).collection("status")
     }
+    fun getAllTheUsersWithStatus(): CollectionReference {
+        return FirebaseFirestore.getInstance().collection("Status")
+    }
     fun getChatroomId(userId1: String, userId2: String): String {
         return if (userId1.hashCode() < userId2.hashCode()) {
             userId1 + "_" + userId2
