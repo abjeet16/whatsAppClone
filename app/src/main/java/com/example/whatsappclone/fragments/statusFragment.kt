@@ -38,12 +38,31 @@ class statusFragment : Fragment() {
     }
 
     private fun setUpOthersStatus() {
-        fireBaseUtils.getAllTheUsersWithStatus().get()
-            .addOnSuccessListener { result ->
-                if(result.documents.isNotEmpty()){
-                    for (document in result) {
-                        val status = document.toObject(String)
-                        myStatusList.add(status)
+        fireBaseUtils.getAllTheUsersWithStatus()
+            .get()
+            .addOnSuccessListener {
+                result->
+                if (result.isEmpty){
+                    Toast.makeText(requireContext(),"no user found", Toast.LENGTH_SHORT).show()
+                }else{
+                    val allUsers = mutableListOf<userDetails>()
+                    for (document in result){
+                        val userID = document.toObject(userDetails::class.java)
+                        allUsers.add(userID)
+                    }
+                    for (i in allUsers){
+                        fireBaseUtils.getOthersStatusReference(i.uid.toString())
+                            .get()
+                            .addOnSuccessListener {
+                                result->
+                                val othersStatus = mutableListOf<Status>()
+                                for (document in result){
+                                    val userID = document.toObject(Status::class.java)
+                                    othersStatus.add(userID)
+                                }
+                                for (i in othersStatus)
+                                Log.d("bhhvda",i.statusText.toString())
+                            }
                     }
                 }
             }

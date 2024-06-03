@@ -94,6 +94,7 @@ class StatusUploadScreen : AppCompatActivity() {
         fireBaseUtils.getStatusReference()
             .add(statusInfo)
             .addOnSuccessListener {
+                fireBaseUtils.setUserIdInSideStatus(this)
                 Toast.makeText(this, "status uploaded successfully", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()

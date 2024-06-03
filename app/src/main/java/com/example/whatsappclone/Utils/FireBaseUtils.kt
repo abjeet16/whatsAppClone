@@ -1,5 +1,8 @@
 package com.example.whatsappclone.Utils
 
+import android.widget.Toast
+import com.example.whatsappclone.Activity.StatusUploadScreen
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -11,7 +14,33 @@ class FireBaseUtils {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
     fun getStatusReference(): CollectionReference {
-        return FirebaseFirestore.getInstance().collection("Status").document(getCurrentUserId()!!).collection("status")
+        return FirebaseFirestore.getInstance()
+            .collection("Status")
+            .document(getCurrentUserId()!!)
+            .collection("status")
+    }
+    fun getOthersStatusReference(userId: String): CollectionReference {
+        return FirebaseFirestore.getInstance()
+            .collection("Status")
+            .document(userId)
+            .collection("status")
+    }
+    fun setUserIdInSideStatus(statusUploadScreen: StatusUploadScreen) {
+        val userId = getCurrentUserId()
+        if (userId != null) {
+            FirebaseFirestore.getInstance()
+                .collection("Status")
+                .document(userId)
+                .set(mapOf("uid" to userId)) // Assuming you want to set the userId as the content
+                .addOnSuccessListener {
+                    Toast.makeText(statusUploadScreen, "Success", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(statusUploadScreen, "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            Toast.makeText(statusUploadScreen, "User ID is null", Toast.LENGTH_SHORT).show()
+        }
     }
     fun getAllTheUsersWithStatus(): CollectionReference {
         return FirebaseFirestore.getInstance().collection("Status")
