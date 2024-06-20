@@ -2,6 +2,7 @@ package com.example.whatsappclone.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import java.util.concurrent.TimeUnit
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ import com.example.whatsappclone.datamodels.Status
 import com.example.whatsappclone.datamodels.othersStatus
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.Serializable
 
 class statusFragment : Fragment() {
 
@@ -135,8 +137,15 @@ class statusFragment : Fragment() {
         return String.format("%02dhr:%02dmin ago", hours, minutes)
     }
     fun otherStatusClicked(statusList: Array<Status>){
+        val imageUrlList = ArrayList<String>()
+        val statusText = ArrayList<String>()
+        for (status in statusList){
+            status.imageUrl?.let { imageUrlList.add(it) }
+            status.statusText?.let { statusText.add(it) }
+        }
         val intent = Intent(requireContext(), OthersStatusVIew::class.java)
-        //intent.putExtra("statusList",statusList)
+        intent.putExtra("statusImageList",imageUrlList)
+        intent.putExtra("statusTextList",statusText)
         startActivity(intent)
     }
 }
