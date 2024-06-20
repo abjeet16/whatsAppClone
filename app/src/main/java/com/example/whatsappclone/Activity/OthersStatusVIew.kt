@@ -24,10 +24,13 @@ class OthersStatusVIew : AppCompatActivity() {
             if (StatusImageList.size == 1)
                 binding.storyNext.isEnabled = false
         }
-        setUpClickListeners(StatusImageList)
+        setUpClickListeners(StatusImageList,StatusTextList)
     }
 
-    private fun setUpClickListeners(StatusList: ArrayList<String>?) {
+    private fun setUpClickListeners(
+        StatusList: ArrayList<String>?,
+        StatusTextList: ArrayList<String>?
+    ) {
         binding.apply {
             cancelButton.setOnClickListener {
                 finish()
@@ -39,7 +42,7 @@ class OthersStatusVIew : AppCompatActivity() {
                     storyBack.isEnabled = false
                 }
                 Glide.with(this@OthersStatusVIew).load(StatusList?.get(statusNumber)).into(Image)
-                //Caption.text = StatusList?.get(statusNumber)?.statusText
+                Caption.text = StatusTextList?.get(statusNumber)
             }
             storyNext.setOnClickListener {
                 storyBack.isEnabled = true
@@ -48,7 +51,7 @@ class OthersStatusVIew : AppCompatActivity() {
                     storyNext.isEnabled = false
                 }
                 Glide.with(this@OthersStatusVIew).load(StatusList?.get(statusNumber)).into(Image)
-                Caption.text = StatusList?.get(statusNumber)?.statusText
+                Caption.text = StatusTextList?.get(statusNumber)
             }
         }
     }
