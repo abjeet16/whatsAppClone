@@ -9,16 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.whatsappclone.Activity.StatusUploadScreen
 import com.example.whatsappclone.Activity.StatusView
 import com.example.whatsappclone.Utils.FireBaseUtils
-import com.example.whatsappclone.adapters.alluserAdapter
 import com.example.whatsappclone.databinding.FragmentStatusBinding
 import com.example.whatsappclone.datamodels.Status
-import com.example.whatsappclone.datamodels.userDetails
+import com.example.whatsappclone.datamodels.othersStatus
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class statusFragment : Fragment() {
 
@@ -38,34 +37,52 @@ class statusFragment : Fragment() {
     }
 
     private fun setUpOthersStatus() {
-        fireBaseUtils.getAllTheUsersWithStatus()
+        //fireBaseUtils.getAllTheUsersWithStatus()
+            FirebaseFirestore.getInstance().collection("Status")
             .get()
             .addOnSuccessListener {
                 result->
                 if (result.isEmpty){
                     Toast.makeText(requireContext(),"no user found", Toast.LENGTH_SHORT).show()
                 }else{
-                    val allUsers = mutableListOf<userDetails>()
-                    for (document in result){
-                        val userID = document.toObject(userDetails::class.java)
-                        allUsers.add(userID)
+                    val documentNames = mutableListOf<String>()
+                    for (document in result) {
+                        //this adds a filter to remove the current user
+                        if (document.id!=FirebaseAuth.getInstance().currentUser?.uid)
+                        documentNames.add(document.id)
                     }
-                    for (i in allUsers){
-                        fireBaseUtils.getOthersStatusReference(i.uid.toString())
-                            .get()
-                            .addOnSuccessListener {
-                                result->
-                                val othersStatus = mutableListOf<Status>()
-                                for (document in result){
-                                    val userID = document.toObject(Status::class.java)
-                                    othersStatus.add(userID)
-                                }
-                                for (i in othersStatus)
-                                Log.d("bhhvda",i.statusText.toString())
-                            }
-                    }
+                    getOthersStatus(documentNames)
                 }
             }
+    }
+
+    private fun getOthersStatus(documentNames: MutableList<String>) {
+        val singlePersonStatusList = mutableListOf<Status>()
+        val statusListToPass = mutableListOf<othersStatus>()
+        for (i in documentNames) {
+            FirebaseFirestore.getInstance().collection("Status").document(i).collection("status")
+                .get()
+                .addOnSuccessListener { result ->
+                    singlePersonStatusList.clear()
+                    for (document in result) {
+                        val user = document.toObject(Status::class.java)
+                        singlePersonStatusList.add(user)
+                    }
+                    statusListToPass.add(othersStatus(singlePersonStatusList))
+
+                    //if (statusListToPass.size==2)
+                        //Log.d(statusListToPass[1].status[0].statusText, "huhvdhcavd")
+                }.addOnFailureListener {
+                    Toast.makeText(requireContext(), "failed to get all user", Toast.LENGTH_SHORT)
+                        .show()
+                }
+        }
+        for (x in statusListToPass){
+            for (y in x.status){
+                Log.d(y.statusText, "huhvdhcavd")
+            }
+            Log.d("break", "huhvdhcavd")
+        }
     }
 
     private fun setUpClickListener() {
