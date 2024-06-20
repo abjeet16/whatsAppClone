@@ -17,6 +17,8 @@ import com.example.whatsappclone.Utils.FireBaseUtils
 import com.example.whatsappclone.databinding.ActivityStatusUploadScreenBinding
 import com.example.whatsappclone.datamodels.Status
 import com.example.whatsappclone.datamodels.userDetails
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
@@ -107,23 +109,32 @@ class StatusUploadScreen : AppCompatActivity() {
             }
     }
 
-    private fun getUserName(): String {
-        var personName:String
-        fireBaseUtils.getUserName().get()
+    private fun getUserName(callback: FirestoreCallback) {
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(FirebaseAuth.getInstance().currentUser?.uid.toString())
+            .get()
             .addOnSuccessListener { result ->
-                    val status = result.toObject(userDetails::class.java)
-                    personName= status?.name.toString()
-                Toast.makeText(this, status?.name.toString(), Toast.LENGTH_SHORT).show()
+                val status = result.toObject(userDetails::class.java)
+                val personName = status?.name.toString()
+                Toast.makeText(this, personName, Toast.LENGTH_SHORT).show()
+                callback.onCallback(personName)
             }.addOnFailureListener { exception ->
                 // Handle any errors
-                Toast.makeText(this, "Error : ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
+                callback.onCallback("") // Return an empty string on failure
             }
-        return personName
     }
+
+
 
     private fun getFileExtension(uri: Uri): String? {
         val contentResolver = contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
     }
+    interface FirestoreCallback {
+        fun onCallback(name: String)
+    }
+
 }
