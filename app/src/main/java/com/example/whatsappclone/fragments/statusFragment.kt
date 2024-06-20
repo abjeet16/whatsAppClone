@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.whatsappclone.Activity.OthersStatusVIew
 import com.example.whatsappclone.Activity.StatusUploadScreen
 import com.example.whatsappclone.Activity.StatusView
 import com.example.whatsappclone.Utils.FireBaseUtils
@@ -85,7 +87,8 @@ class statusFragment : Fragment() {
 
     private fun setUpRecyclerview(statusListToPass: List<othersStatus>) {
         val adapter:otherSatusAdapter
-        adapter = otherSatusAdapter(statusListToPass)
+        adapter = otherSatusAdapter(statusListToPass,requireContext(),::otherStatusClicked)
+        binding.RecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.RecyclerView.adapter = adapter
     }
 
@@ -130,5 +133,10 @@ class statusFragment : Fragment() {
             return String.format("%d days ago", days)
         }
         return String.format("%02dhr:%02dmin ago", hours, minutes)
+    }
+    fun otherStatusClicked(statusList: Array<Status>){
+        val intent = Intent(requireContext(), OthersStatusVIew::class.java)
+        //intent.putExtra("statusList",statusList)
+        startActivity(intent)
     }
 }

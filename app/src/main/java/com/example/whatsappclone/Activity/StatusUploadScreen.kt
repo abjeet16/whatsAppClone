@@ -28,10 +28,11 @@ class StatusUploadScreen : AppCompatActivity() {
         ActivityStatusUploadScreenBinding.inflate(layoutInflater)
     }
     private lateinit var profileImageLocalPath: String
-    private lateinit var statusInfo:Status
+    private lateinit var statusInfo: Status
     private val fireBaseUtils = FireBaseUtils()
-    private lateinit var imageURI:String
-    private lateinit var statusPhotoUUID:String
+    private lateinit var imageURI: String
+    private lateinit var statusPhotoUUID: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -39,7 +40,6 @@ class StatusUploadScreen : AppCompatActivity() {
         pickImage.launch("image/*")
 
         buttonClickListeners()
-
     }
 
     private fun buttonClickListeners() {
@@ -47,7 +47,7 @@ class StatusUploadScreen : AppCompatActivity() {
             selectAnotherImage.setOnClickListener {
                 pickImage.launch("image/*")
             }
-            cancelButton.setOnClickListener{
+            cancelButton.setOnClickListener {
                 finish()
             }
             uploadImage.setOnClickListener {
@@ -57,25 +57,32 @@ class StatusUploadScreen : AppCompatActivity() {
         }
     }
 
-    val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()){ uri->
-        if (uri != null){
+    val pickImage = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
             binding.Image.setImageURI(uri)
             profileImageLocalPath = uri.toString()
         }
     }
+
     private fun uploadImageToFirebase(fileUri: Uri?) {
         statusPhotoUUID = UUID.randomUUID().toString()
         if (fileUri != null) {
             val storageReference = FirebaseStorage.getInstance().reference
             val fileReference = storageReference.child(
-                "Status/${statusPhotoUUID}.${getFileExtension(fileUri)}")
+                "Status/${statusPhotoUUID}.${getFileExtension(fileUri)}"
+            )
 
             fileReference.putFile(fileUri)
                 .addOnSuccessListener { taskSnapshot ->
                     // Get the download URL
                     taskSnapshot.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
                         imageURI = uri.toString()
-                        uploadStatusInfoToFirebase()
+                        // Call getUserName and pass a callback to handle the retrieved name
+                        getUserName(object : FirestoreCallback {
+                            override fun onCallback(name: String) {
+                                uploadStatusInfoToFirebase(name)
+                            }
+                        })
                     }
                 }
                 .addOnFailureListener { e ->
@@ -86,26 +93,26 @@ class StatusUploadScreen : AppCompatActivity() {
         }
     }
 
-    private fun uploadStatusInfoToFirebase() {
+    private fun uploadStatusInfoToFirebase(userName: String) {
         statusInfo = Status(
             statusId = statusPhotoUUID,
             imageUrl = imageURI,
             statusText = binding.Caption.text.toString(),
             timestamp = System.currentTimeMillis(),
-            personName = getUserName()
+            personName = userName
         )
 
         fireBaseUtils.getStatusReference()
             .add(statusInfo)
             .addOnSuccessListener {
                 fireBaseUtils.setUserIdInSideStatus(this)
-                Toast.makeText(this, "status uploaded successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Status uploaded successfully", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
             .addOnFailureListener { e ->
                 binding.uploadImage.visibility = View.VISIBLE
-                Toast.makeText(this, "Error : ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -119,22 +126,21 @@ class StatusUploadScreen : AppCompatActivity() {
                 val personName = status?.name.toString()
                 Toast.makeText(this, personName, Toast.LENGTH_SHORT).show()
                 callback.onCallback(personName)
-            }.addOnFailureListener { exception ->
+            }
+            .addOnFailureListener { exception ->
                 // Handle any errors
                 Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
                 callback.onCallback("") // Return an empty string on failure
             }
     }
 
-
-
     private fun getFileExtension(uri: Uri): String? {
         val contentResolver = contentResolver
         val mimeTypeMap = MimeTypeMap.getSingleton()
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri))
     }
+
     interface FirestoreCallback {
         fun onCallback(name: String)
     }
-
 }
