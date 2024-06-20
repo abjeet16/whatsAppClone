@@ -16,6 +16,7 @@ import com.example.whatsappclone.R
 import com.example.whatsappclone.Utils.FireBaseUtils
 import com.example.whatsappclone.databinding.ActivityStatusUploadScreenBinding
 import com.example.whatsappclone.datamodels.Status
+import com.example.whatsappclone.datamodels.userDetails
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
@@ -88,7 +89,8 @@ class StatusUploadScreen : AppCompatActivity() {
             statusId = statusPhotoUUID,
             imageUrl = imageURI,
             statusText = binding.Caption.text.toString(),
-            timestamp = System.currentTimeMillis()
+            timestamp = System.currentTimeMillis(),
+            personName = getUserName()
         )
 
         fireBaseUtils.getStatusReference()
@@ -103,6 +105,20 @@ class StatusUploadScreen : AppCompatActivity() {
                 binding.uploadImage.visibility = View.VISIBLE
                 Toast.makeText(this, "Error : ${e.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun getUserName(): String {
+        var personName:String
+        fireBaseUtils.getUserName().get()
+            .addOnSuccessListener { result ->
+                    val status = result.toObject(userDetails::class.java)
+                    personName= status?.name.toString()
+                Toast.makeText(this, status?.name.toString(), Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { exception ->
+                // Handle any errors
+                Toast.makeText(this, "Error : ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+        return personName
     }
 
     private fun getFileExtension(uri: Uri): String? {

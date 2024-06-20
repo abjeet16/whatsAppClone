@@ -3,7 +3,6 @@ package com.example.whatsappclone.fragments
 import android.content.Intent
 import android.os.Bundle
 import java.util.concurrent.TimeUnit
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.example.whatsappclone.Activity.StatusUploadScreen
 import com.example.whatsappclone.Activity.StatusView
 import com.example.whatsappclone.Utils.FireBaseUtils
+import com.example.whatsappclone.adapters.otherSatusAdapter
 import com.example.whatsappclone.databinding.FragmentStatusBinding
 import com.example.whatsappclone.datamodels.Status
 import com.example.whatsappclone.datamodels.othersStatus
@@ -57,33 +57,38 @@ class statusFragment : Fragment() {
     }
 
     private fun getOthersStatus(documentNames: MutableList<String>) {
-        val singlePersonStatusList = mutableListOf<Status>()
         val statusListToPass = mutableListOf<othersStatus>()
+        var completedQueries = 0
+        val totalQueries = documentNames.size
+
         for (i in documentNames) {
             FirebaseFirestore.getInstance().collection("Status").document(i).collection("status")
                 .get()
                 .addOnSuccessListener { result ->
-                    singlePersonStatusList.clear()
+                    val singlePersonStatusList = mutableListOf<Status>()
                     for (document in result) {
                         val user = document.toObject(Status::class.java)
                         singlePersonStatusList.add(user)
                     }
                     statusListToPass.add(othersStatus(singlePersonStatusList))
 
-                    //if (statusListToPass.size==2)
-                        //Log.d(statusListToPass[1].status[0].statusText, "huhvdhcavd")
+                    completedQueries++
+                    if (completedQueries == totalQueries) {
+                        // All queries are completed, now you can log the results
+                        setUpRecyclerview(statusListToPass)
+                    }
                 }.addOnFailureListener {
-                    Toast.makeText(requireContext(), "failed to get all user", Toast.LENGTH_SHORT)
-                        .show()
+                    Toast.makeText(requireContext(), "Failed to get all user statuses", Toast.LENGTH_SHORT).show()
                 }
         }
-        for (x in statusListToPass){
-            for (y in x.status){
-                Log.d(y.statusText, "huhvdhcavd")
-            }
-            Log.d("break", "huhvdhcavd")
-        }
     }
+
+    private fun setUpRecyclerview(statusListToPass: List<othersStatus>) {
+        val adapter:otherSatusAdapter
+        adapter = otherSatusAdapter(statusListToPass)
+        binding.RecyclerView.adapter = adapter
+    }
+
 
     private fun setUpClickListener() {
         binding.addStatus.setOnClickListener{

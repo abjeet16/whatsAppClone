@@ -6,4 +6,5 @@ data class Status(
     var statusId: String? = null,
     var imageUrl: String? = null,
     var statusText: String? = null,
-    var timestamp: Long? = null) : Serializable
+    var timestamp: Long? = null,
+    var personName:String? = null) : Serializable

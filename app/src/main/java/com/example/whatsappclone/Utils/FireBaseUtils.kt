@@ -6,6 +6,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
@@ -24,6 +25,11 @@ class FireBaseUtils {
             .collection("Status")
             .document(userId)
             .collection("status")
+    }
+    fun getUserName(): DocumentReference {
+        return FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(getCurrentUserId()!!)
     }
     fun setUserIdInSideStatus(statusUploadScreen: StatusUploadScreen) {
         val userId = getCurrentUserId()
