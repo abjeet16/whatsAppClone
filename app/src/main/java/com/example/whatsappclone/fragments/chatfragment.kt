@@ -2,12 +2,12 @@ package com.example.whatsappclone.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.whatsappclone.Activity.chatRoom
 import com.example.whatsappclone.adapters.alluserAdapter
@@ -22,6 +22,7 @@ class chatfragment : Fragment() {
 
     private lateinit var binding: FragmentChatfragmentBinding
     private lateinit var firebaseFirestore: FirebaseFirestore
+    private lateinit var AlluserList :MutableList<userDetails>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,6 +31,7 @@ class chatfragment : Fragment() {
 
         firebaseFirestore = Firebase.firestore
         getAllUsers()
+        searnchPanel()
         return binding.root
     }
 
@@ -37,16 +39,14 @@ class chatfragment : Fragment() {
         firebaseFirestore.collection("users")
             .get()
             .addOnSuccessListener { result ->
-                val userList = mutableListOf<userDetails>()
+                AlluserList = mutableListOf<userDetails>()
                 for (document in result) {
                     val user = document.toObject(userDetails::class.java)
                     if (user.uid != FirebaseAuth.getInstance().uid) {
-                        userList.add(user)
+                        AlluserList.add(user)
                     }
                 }
-                val adapter = alluserAdapter(userList,requireContext(),::chatItemClicked)
-                binding.recyclerViewChat.adapter = adapter
-                binding.recyclerViewChat.layoutManager = LinearLayoutManager(requireContext())
+                showAllMenu()
             }.addOnFailureListener{
                 Toast.makeText(requireContext(),"failed to get all user", Toast.LENGTH_SHORT).show()
             }
@@ -57,5 +57,35 @@ class chatfragment : Fragment() {
         intent.putExtra("uid",userDetail.uid)
         intent.putExtra("profileImageUrl",userDetail.profileImageUrl)
         startActivity(intent)
+    }
+    private fun showAllMenu() {
+        val filteredMenuItem = ArrayList(AlluserList)
+        setAdapter(filteredMenuItem)
+    }
+
+    private fun setAdapter(filterUserList: List<userDetails>) {
+        val adapter = alluserAdapter(filterUserList,requireContext(),::chatItemClicked)
+        binding.recyclerViewChat.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewChat.adapter = adapter
+    }
+
+    fun searnchPanel(){
+        binding.searchViewSearchFragment.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String): Boolean {
+                filterMenuitem(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                filterMenuitem(newText)
+                return true
+            }
+        })
+    }
+    fun filterMenuitem(query: String) {
+        val filteredUserList = AlluserList.filter {
+            it.name?.contains(query, ignoreCase = true) == true
+        }
+        setAdapter(filteredUserList)
     }
 }

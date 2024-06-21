@@ -10,7 +10,7 @@ import com.example.whatsappclone.databinding.ItemUserBinding
 import com.example.whatsappclone.datamodels.userDetails
 
 class alluserAdapter(
-    private val listOFalluser: MutableList<userDetails>,
+    private val listOFalluser: List<userDetails>,
     private val context: Context,
     val chatItemClicked:(userDetails)-> Unit
 ): RecyclerView.Adapter<alluserAdapter.alluserViewHolder>() {

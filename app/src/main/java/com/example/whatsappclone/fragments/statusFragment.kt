@@ -133,8 +133,14 @@ class statusFragment : Fragment() {
         if (hours>24){
             val days = TimeUnit.MILLISECONDS.toDays(millis)
             return String.format("%d days ago", days)
+        }else if (hours.toInt() == 0){
+            return String.format("%d min ago",minutes)
+        }else if (minutes.toInt() == 0){
+            return String.format("just now")
+        }else if (hours.toInt() >= 1){
+            return String.format("%d hr ago",hours)
         }
-        return String.format("%02dhr:%02dmin ago", hours, minutes)
+        return String.format("%d hr %d min ago",hours,minutes)
     }
     fun otherStatusClicked(statusList: Array<Status>){
         val imageUrlList = ArrayList<String>()
